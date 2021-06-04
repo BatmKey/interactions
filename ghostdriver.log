@@ -1,0 +1,55 @@
+[INFO  - 2021-06-04T06:42:05.359Z] GhostDriver - Main - running on port 55616
+[INFO  - 2021-06-04T06:42:05.671Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.settings - {"XSSAuditingEnabled":false,"javascriptCanCloseWindows":true,"javascriptCanOpenWindows":true,"javascriptEnabled":true,"loadImages":true,"localToRemoteUrlAccessEnabled":false,"userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1","webSecurityEnabled":true}
+[INFO  - 2021-06-04T06:42:05.671Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.customHeaders:  - {}
+[INFO  - 2021-06-04T06:42:05.671Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - Session.negotiatedCapabilities - {"browserName":"phantomjs","version":"2.1.1","driverName":"ghostdriver","driverVersion":"1.2.0","platform":"mac-unknown-64bit","javascriptEnabled":true,"takesScreenshot":true,"handlesAlerts":false,"databaseEnabled":false,"locationContextEnabled":false,"applicationCacheEnabled":false,"browserConnectionEnabled":false,"cssSelectorsEnabled":true,"webStorageEnabled":false,"rotatable":false,"acceptSslCerts":false,"nativeEvents":true,"proxy":{"proxyType":"direct"}}
+[INFO  - 2021-06-04T06:42:05.672Z] SessionManagerReqHand - _postNewSessionCommand - New Session Created: fa1a8a40-c4ff-11eb-baa8-4552fdef369e
+[ERROR - 2021-06-04T06:42:07.596Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - msg: InvalidStateError: DOM Exception 11: An attempt was made to use an object that is not, or is no longer, usable.
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.596Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - stack:
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  dispatchEvent (:0)
+  l (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.638Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - msg: InvalidStateError: DOM Exception 11: An attempt was made to use an object that is not, or is no longer, usable.
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.638Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - stack:
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  dispatchEvent (:0)
+  l (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.721Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - msg: InvalidStateError: DOM Exception 11: An attempt was made to use an object that is not, or is no longer, usable.
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.721Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - stack:
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  dispatchEvent (:0)
+  l (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.787Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - msg: InvalidStateError: DOM Exception 11: An attempt was made to use an object that is not, or is no longer, usable.
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.787Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - stack:
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  dispatchEvent (:0)
+  l (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.792Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - msg: InvalidStateError: DOM Exception 11: An attempt was made to use an object that is not, or is no longer, usable.
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2021-06-04T06:42:07.793Z] Session [fa1a8a40-c4ff-11eb-baa8-4552fdef369e] - page.onError - stack:
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  dispatchEvent (:0)
+  l (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+  (anonymous function) (https://g.alicdn.com/scout/probe_cdn/index.js?v=1234:1)
+
+  phantomjs://platform/console++.js:263 in error

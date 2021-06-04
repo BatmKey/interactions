@@ -1,0 +1,151 @@
+# coding=utf-8
+"""
+基本逻辑
+1. 先遍历所有的文章提取保存 「评论数」 和 「作者id」
+2. 根据去重后的作者id抓取最近20条文章的互动数
+3. 根据需求导出数据
+
+缓存有效期：12小时
+即12小时内重复的数据不会重复抓取
+
+"""
+import os
+import time
+import traceback
+from shutil import copyfile
+import requests
+from selenium import webdriver
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import datetime
+from handler.output import write_by_ids
+# from handler.read_format import read_format, number_format
+from model.datas import Datas
+
+from extract import extract_item, is_exist
+
+CHOUR = 1
+engine = create_engine('sqlite:///info.db')
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# ed_user = Datas(aid=6957721672602354213, author_name="爱玩儿车EverCar", author_id="3724783485983447", types=3, read=8204,
+#                 crawl_time=int(time.time()), comment=17)
+# session.add(ed_user)
+# session.commit()
+
+"""
+1.读取待处理数据
+"""
+with open('url.txt', 'r') as f:
+    tasksr = f.readlines()
+
+tasks = []
+
+for task in tasksr:
+    # 扫描所有的url作为task
+    task = task.strip()
+    if not task:
+        continue
+    tasks.append([task])
+
+"""
+1.5 选择动作
+    1 - 开始扫描任务
+    2 - 导出结果
+"""
+
+work = input("""
+# 目前支持的平台有
+### 视频类型 ###
+1. b站 播放量
+2. 优酷 粉丝数
+3. 好看视频 播放量
+4. afcun 播放量
+5. 凤凰 播放量
+6. 趣头条 播放量
+7. 西瓜视频 播放量
+8. 爱奇艺 粉丝数
+
+### 新闻类型
+1. 网易新闻 跟帖数，评论数
+
+# 请选择需要进行的操作，输入数字后回车
+1. 【扫描】扫描获取互动数
+2. 【导出】根据URL导出已抓取结果
+3. 【删除全部缓存】将删除本地保存的全部缓存数据 - 一般不需要使用
+
+--> 1 步骤可以反复执行，结果实时保存到本地数据库，失败可以直接重新运行。会自动继续执行。如果链接不变则12小时内不会重新跑作者页面会直接导出已抓到的数据。
+--> 2 步骤会从本地数据库匹配提供的URL并导出数据
+--> 3 步骤会将本地数据库删除并还原，平时不需要使用，仅在工具异常或者想重新跑(清理12小时缓存)时使用
+--> 请输入：
+""")
+if int(work) == 2:
+    ff = write_by_ids(tasks, session)
+    print("【恭喜】全部任务已经完成，数据已经导出到", ff)
+    print("请直接关闭")
+    time.sleep(10000)
+    exit(0)
+if int(work) == 3:
+    os.remove("info.db")
+    copyfile(os.path.join('back_up', 'info.db'), 'info.db')
+    print("清理成功，请直接退出 (5s)")
+    time.sleep(5)
+    exit(0)
+"""
+2. 记录所有url对应的账号id
+"""
+author_box = []
+while True:
+    browser = webdriver.PhantomJS('./phantomjs')
+    browser.set_window_size(1440, 660)
+    for i, task in enumerate(tasks):
+        # 查询是否已经抓取过, 并且没超时
+        timestamp = int(time.mktime((datetime.datetime.now() - datetime.timedelta(hours=12)).timetuple()))
+        data = session.query(Datas).filter_by(url=task[0]).filter(Datas.crawl_time > timestamp).first()
+        try:
+            if not data:
+                print("进度条 -------", i, "/", len(tasks))
+                browser.get(task[0])
+                body = browser.page_source
+                time.sleep(1)
+                browser.save_screenshot('1.png')
+                # if "<body>error</body>" in body:
+                #     # 已经被封 修改ua继续
+                #     print("【被BAN·自动重启并继续】")
+                #     browser.close()
+                #     user_catch = False
+                #     break
+                if requests.get(task[0]).status_code == 404 or (not is_exist(body)):
+                    # 已删除
+                    result = Datas(url=(task[0]), crawl_time=int(time.time()), is_del=1)
+                    session.add(result)
+                    session.commit()
+                    continue
+                item = extract_item(task[0], body)
+                result = Datas(url=task[0],
+                               read_num=item['read_num'],
+                               fans_num=item['fans_num'],
+                               comment_num=item['comment_num'],
+                               gentie_num=item['gentie_num'],
+                               crawl_time=int(time.time()),
+                               is_del=0)
+                session.add(result)
+                session.commit()
+
+            else:
+                print("已经抓取过 %s 取数据库缓存" % task[0])
+                continue
+        except:
+            print(traceback.format_exc())
+            print('出现异常！ 重启继续')
+            browser.close()
+            break
+    break
+
+# print("正在导出全部数据：")
+# ff = write_by_ids(tasks, session)
+# browser.close()
+# print("【恭喜】全部任务已经完成，数据已经导出到", ff)
+# print("请直接关闭")
+# time.sleep(10000)
