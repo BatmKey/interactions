@@ -1,13 +1,6 @@
 # coding=utf-8
 """
 基本逻辑
-1. 先遍历所有的文章提取保存 「评论数」 和 「作者id」
-2. 根据去重后的作者id抓取最近20条文章的互动数
-3. 根据需求导出数据
-
-缓存有效期：12小时
-即12小时内重复的数据不会重复抓取
-
 """
 import os
 import time
@@ -21,7 +14,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String
 import datetime
 from handler.output import write_by_ids
-# from handler.read_format import read_format, number_format
 from model.datas import Datas
 
 from extract import extract_item, is_exist
@@ -126,6 +118,7 @@ while True:
     chrome_options.add_argument('lang=zh-CN,zh,zh-TW,en-US,en')
     chrome_options.add_argument("disable-blink-features=AutomationControlled")
     chrome_options.add_argument("--headless")
+    browser = None
     try:
         browser = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
     except:
