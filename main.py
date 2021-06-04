@@ -13,10 +13,12 @@ import os
 import time
 import traceback
 from shutil import copyfile
-import requests
+import random
 from selenium import webdriver
+import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String
 import datetime
 from handler.output import write_by_ids
 # from handler.read_format import read_format, number_format
@@ -24,8 +26,21 @@ from model.datas import Datas
 
 from extract import extract_item, is_exist
 
-CHOUR = 1
+CHOUR = 2
 engine = create_engine('sqlite:///info.db')
+if not engine.dialect.has_table(engine, 'datas'):
+    metadata = sqlalchemy.schema.MetaData(engine)
+    sqlalchemy.schema.Table('datas', metadata,
+                            Column('id', Integer, primary_key=True, autoincrement=True),
+                            Column('url', String(256)),
+                            Column('like_num', Integer),
+                            Column('read_num', Integer),
+                            Column('fans_num', Integer),
+                            Column('comment_num', Integer),
+                            Column('gentie_num', Integer),
+                            Column('crawl_time', Integer),
+                            Column('is_del', Integer))
+    metadata.create_all()
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -65,7 +80,7 @@ work = input("""
 5. 凤凰 播放量
 6. 趣头条 播放量
 7. 西瓜视频 播放量
-8. 爱奇艺 粉丝数
+8. 爱奇艺 用户名 粉丝数 点赞数
 
 ### 新闻类型
 1. 网易新闻 跟帖数，评论数
@@ -75,9 +90,9 @@ work = input("""
 2. 【导出】根据URL导出已抓取结果
 3. 【删除全部缓存】将删除本地保存的全部缓存数据 - 一般不需要使用
 
---> 1 步骤可以反复执行，结果实时保存到本地数据库，失败可以直接重新运行。会自动继续执行。如果链接不变则12小时内不会重新跑作者页面会直接导出已抓到的数据。
+--> 1 步骤可以反复执行，结果实时保存到本地数据库，失败可以直接重新运行。会自动继续执行。如果链接不变则2小时内不会重新跑作者页面会直接导出已抓到的数据。
 --> 2 步骤会从本地数据库匹配提供的URL并导出数据
---> 3 步骤会将本地数据库删除并还原，平时不需要使用，仅在工具异常或者想重新跑(清理12小时缓存)时使用
+--> 3 步骤会将本地数据库删除并还原，平时不需要使用，仅在工具异常或者想重新跑(清理2小时缓存)时使用
 --> 请输入：
 """)
 if int(work) == 2:
@@ -97,7 +112,28 @@ if int(work) == 3:
 """
 author_box = []
 while True:
-    browser = webdriver.PhantomJS('./phantomjs')
+    # browser = webdriver.PhantomJS(executable_path='./phantomjs',
+    #                               desired_capabilities=
+    #                               {'phantomjs.page.settings.resourceTimeout': '10000',
+    #                                'phantomjs.page.settings.userAgent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+    #                                                                     'AppleWebKit/537.36 (KHTML, like Gecko) '
+    rdm = random.randint(1000, 9999)
+    rdm2 = random.randint(81, 91)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option(
+        "excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    chrome_options.add_argument('lang=zh-CN,zh,zh-TW,en-US,en')
+    chrome_options.add_argument("disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("--headless")
+    try:
+        browser = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
+    except:
+        print("【错误】ChromeDriver 版本异常或者找不到！请退出")
+        time.sleep(10000)
+    browser.set_page_load_timeout(10)
+    browser.set_script_timeout(10)
+    browser.implicitly_wait(1)
     browser.set_window_size(1440, 660)
     for i, task in enumerate(tasks):
         # 查询是否已经抓取过, 并且没超时
@@ -106,6 +142,7 @@ while True:
         try:
             if not data:
                 print("进度条 -------", i, "/", len(tasks))
+                browser.set_page_load_timeout(15)
                 browser.get(task[0])
                 body = browser.page_source
                 time.sleep(1)
@@ -116,18 +153,25 @@ while True:
                 #     browser.close()
                 #     user_catch = False
                 #     break
-                if requests.get(task[0]).status_code == 404 or (not is_exist(body)):
+                if not is_exist(browser.current_url, body):
                     # 已删除
+                    print('该帖子已经删除...自动跳过...%s' % task[0])
                     result = Datas(url=(task[0]), crawl_time=int(time.time()), is_del=1)
                     session.add(result)
                     session.commit()
                     continue
                 item = extract_item(task[0], body)
+                if item.get('need_more_detail', ''):
+                    browser.get(item['need_more_detail'])
+                    browser.save_screenshot('1.png')
+                    body = browser.page_source
+                    item = extract_item(task[0], body, detail_page=True)
                 result = Datas(url=task[0],
                                read_num=item['read_num'],
                                fans_num=item['fans_num'],
                                comment_num=item['comment_num'],
                                gentie_num=item['gentie_num'],
+                               like_num=item['like_num'],
                                crawl_time=int(time.time()),
                                is_del=0)
                 session.add(result)
@@ -143,9 +187,9 @@ while True:
             break
     break
 
-# print("正在导出全部数据：")
-# ff = write_by_ids(tasks, session)
-# browser.close()
-# print("【恭喜】全部任务已经完成，数据已经导出到", ff)
-# print("请直接关闭")
-# time.sleep(10000)
+print("正在导出全部数据：")
+ff = write_by_ids(tasks, session)
+browser.close()
+print("【恭喜】全部任务已经完成，数据已经导出到", ff)
+print("请直接关闭")
+time.sleep(10000)

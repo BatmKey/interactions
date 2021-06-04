@@ -2,9 +2,6 @@
 from sqlalchemy import Column, Integer, String
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql.schema import PrimaryKeyConstraint
-from sqlalchemy.sql.sqltypes import VARCHAR
-
 Base = declarative_base()
 
 
@@ -17,11 +14,10 @@ class Datas(Base):
     # 不要看随便将一个非主键字段设为primary_key，然后似乎就没报错就能使用了，sqlalchemy在接收到查询结果后还会自己根据主键进行一次去重
     # 指定id映射到id字段; id字段为整型，为主键，自动增长（其实整型主键默认就自动增长）
     id = Column(Integer, primary_key=True, autoincrement=True)
-
     url = Column(String(256))
     # 指定name映射到name字段; name字段为字符串类形，
-    author_name = Column(String(256))
-    author_id = Column(String(256))
+    # author_name = Column(String(256))
+    # author_id = Column(String(256))
     like_num = Column(Integer)
     read_num = Column(Integer)
     fans_num = Column(Integer)
@@ -33,9 +29,9 @@ class Datas(Base):
     is_del = Column(Integer)
 
     # __repr__方法用于输出该类的对象被print()时输出的字符串，如果不想写可以不写
-    def __repr__(self):
-        return "<Data(url='%s', like_num='%s', read_num='%s')>" % (
-            self.url, self.like_num, self.read_num)
+    # def __repr__(self):
+    #     return "<Data(url='%s', like_num='%s', read_num='%s')>" % (
+    #         self.url, self.like_num, self.read_num)
 
 # 视频类型 https://www.ixigua.com/6957721672602354213
 
