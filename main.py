@@ -126,8 +126,8 @@ while True:
         time.sleep(10000)
     browser.set_page_load_timeout(10)
     browser.set_script_timeout(10)
-    browser.implicitly_wait(1)
-    browser.set_window_size(1440, 660)
+    browser.implicitly_wait(2)
+    browser.set_window_size(2080, 1600)
     for i, task in enumerate(tasks):
         # 查询是否已经抓取过, 并且没超时
         timestamp = int(time.mktime((datetime.datetime.now() - datetime.timedelta(hours=12)).timetuple()))
@@ -137,9 +137,9 @@ while True:
                 print("进度条 -------", i, "/", len(tasks))
                 browser.set_page_load_timeout(15)
                 browser.get(task[0])
-                body = browser.page_source
                 time.sleep(1)
                 browser.save_screenshot('1.png')
+                body = browser.page_source
                 # if "<body>error</body>" in body:
                 #     # 已经被封 修改ua继续
                 #     print("【被BAN·自动重启并继续】")

@@ -43,18 +43,20 @@ def extract_item(url, html_source, detail_page=False):
                     if detail_url:
                         detail_url = detail_url.group(1)
                     return dict({'need_more_detail': detail_url})
-
             # 判断是否key是否存在，存在则去取 xpath 提取内容
-            read_num = number_format(''.join(html.xpath(config['read_num']))) \
-                if config.get('read_num', '') else ''
-            fans_num = number_format(''.join(html.xpath(config['fans_num']))) \
-                if config.get('fans_num', '') else ''
-            gentie_num = number_format(''.join(html.xpath(config['gentie_num']))) \
-                if config.get('gentie_num', '') else ''
-            comment_num = number_format(''.join(html.xpath(config['comment_num']))) \
-                if config.get('comment_num', '') else ''
-            like_num = number_format(''.join(html.xpath(config['like_num']))) \
-                if config.get('like_num', '') else ''
+            try:
+                read_num = number_format(''.join(html.xpath(config['read_num']))) \
+                    if config.get('read_num', '') else ''
+                fans_num = number_format(''.join(html.xpath(config['fans_num']))) \
+                    if config.get('fans_num', '') else ''
+                gentie_num = number_format(''.join(html.xpath(config['gentie_num']))) \
+                    if config.get('gentie_num', '') else ''
+                comment_num = number_format(''.join(html.xpath(config['comment_num']))) \
+                    if config.get('comment_num', '') else ''
+                like_num = number_format(''.join(html.xpath(config['like_num']))) \
+                    if config.get('like_num', '') else ''
+            except:
+                print('这条链接提取内容出错 %s' % url)
     result = {
         'url': url,
         'read_num': read_num,
@@ -125,5 +127,12 @@ sites_config = [
             "fans_num": '//li[contains(@class,"list-li")][3]/a/p[1]/text()',
             "like_num": '//li[contains(@class,"list-li")][4]/a/p[1]/text()'
         }
-    }
+    },
+    {
+        "site_name": "西瓜视频",
+        "domain": "www.ixigua.com",
+        "config": {
+            "read_num": '//p[@class="videoDesc__videoStatics"]/span[1]/text()[1]',
+        }
+    },
 ]
